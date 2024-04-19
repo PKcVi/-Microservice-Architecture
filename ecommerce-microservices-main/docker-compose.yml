@@ -1,0 +1,77 @@
+version: '3'
+services:
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  authentication:
+    image: authentication-image
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongodb
+
+  product:
+    image: product-image
+    ports:
+      - "3002:3002"
+    depends_on:
+      - mongodb
+      - authentication
+
+  inventory:
+    image: inventory-image
+    ports:
+      - "3005:3005"
+    depends_on:
+      - mongodb
+      - authentication
+
+  order:
+    image: order-image
+    ports:
+      - "3003:3003"
+    depends_on:
+      - mongodb
+      - authentication
+      - product
+
+  payment:
+    image: payment-image
+    ports:
+      - "3004:3004"
+    depends_on:
+      - mongodb
+      - authentication
+      - product
+      - order
+
+  analytics:
+    image: analytics-image
+    ports:
+      - "3006:3006"
+    depends_on:
+      - mongodb
+      - authentication
+      - product
+      - inventory
+      - order
+      - payment
+
+  react-client:
+    image: react-app-image
+    ports:
+      - "3000:3000"
+    depends_on:
+      - authentication
+      - product
+      - inventory
+      - order
+      - payment
+      - analytics
+
+volumes:
+  mongo-data:
